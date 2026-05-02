@@ -1,0 +1,49 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg18
+    container_name: ai-assistant-postgres
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-goclaw}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-goclaw}
+      POSTGRES_DB: ${POSTGRES_DB:-goclaw}
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-goclaw} -d ${POSTGRES_DB:-goclaw}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  calendar-mcp:
+    profiles:
+      - calendar
+    build:
+      context: ./docker/calendar-mcp
+      args:
+        GOOGLE_CALENDAR_MCP_VERSION: 2.6.1
+    container_name: ai-assistant-calendar-mcp
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${CALENDAR_MCP_PORT:-3000}:3000"
+    environment:
+      TRANSPORT: http
+      HOST: 0.0.0.0
+      PORT: 3000
+      GOOGLE_OAUTH_CREDENTIALS: /app/secrets/gcp-oauth.keys.json
+      GOOGLE_CALENDAR_MCP_TOKEN_PATH: /home/node/.config/google-calendar-mcp/tokens.json
+      ENABLED_TOOLS: list-calendars,list-events,search-events,get-event,get-freebusy
+    volumes:
+      - ${GOOGLE_OAUTH_CREDENTIALS_PATH:-./.secrets/gcp-oauth.keys.json}:/app/secrets/gcp-oauth.keys.json:ro
+      - calendar-mcp-tokens:/home/node/.config/google-calendar-mcp
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:3000/health >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  postgres-data:
+  calendar-mcp-tokens:

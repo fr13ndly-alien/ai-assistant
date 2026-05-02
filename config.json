@@ -1,0 +1,89 @@
+{
+  "data_dir": "./.runtime/data",
+  "agents": {
+    "defaults": {
+      "workspace": "./.runtime/workspace",
+      "restrict_to_workspace": true,
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "max_tokens": 4096,
+      "temperature": 0.2,
+      "max_tool_iterations": 12,
+      "max_tool_calls": 16,
+      "context_window": 200000,
+      "memory": {
+        "enabled": false
+      }
+    },
+    "list": {
+      "assistant": {
+        "displayName": "Assistant",
+        "default": true,
+        "skills": [
+          "research-brief"
+        ],
+        "tools": {
+          "allow": [
+            "web_search",
+            "web_fetch",
+            "datetime"
+          ]
+        },
+        "identity": {
+          "name": "Assistant"
+        }
+      }
+    }
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "allow_from": [],
+      "dm_policy": "pairing",
+      "group_policy": "disabled",
+      "reaction_level": "minimal"
+    }
+  },
+  "providers": {
+    "openai": {}
+  },
+  "gateway": {
+    "host": "127.0.0.1",
+    "port": 18790,
+    "max_message_chars": 32000,
+    "rate_limit_rpm": 20
+  },
+  "tools": {
+    "allow": [
+      "web_search",
+      "web_fetch",
+      "datetime"
+    ],
+    "execApproval": {
+      "security": "full",
+      "ask": "off"
+    },
+    "web_fetch": {
+      "policy": "allow_all",
+      "blocked_domains": []
+    },
+    "browser": {
+      "enabled": false
+    },
+    "rate_limit_per_hour": 150,
+    "scrub_credentials": true
+  },
+  "sessions": {
+    "scope": "per-sender",
+    "dm_scope": "per-channel-peer"
+  },
+  "tts": {},
+  "bindings": [
+    {
+      "agentId": "assistant",
+      "match": {
+        "channel": "telegram"
+      }
+    }
+  ]
+}

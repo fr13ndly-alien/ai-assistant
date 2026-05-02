@@ -2,12 +2,15 @@
 .env
 .env.*
 !.env.example
+.secrets/
+gcp-oauth.keys.json
 
 # Logs and runtime output
 *.log
 logs/
 tmp/
 temp/
+.runtime/
 
 # OS and editor files
 .DS_Store
@@ -34,4 +37,3 @@ venv/
 # Go
 bin/
 coverage.out
-
